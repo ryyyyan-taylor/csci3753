@@ -1,0 +1,10 @@
+Sep 14 21:30:00 ryan-vm systemd[1262]: Time has been changed
+Sep 14 21:29:48 ryan-vm systemd[1262]: Time has been changed
+Sep 14 21:29:48 ryan-vm systemd[1]: Time has been changed
+Sep 14 21:31:00 ryan-vm systemd[1]: Time has been changed
+Sep 14 21:31:00 ryan-vm systemd[1262]: Time has been changed
+Sep 14 21:30:48 ryan-vm systemd[1262]: Time has been changed
+Sep 14 21:30:48 ryan-vm systemd[1]: Time has been changed
+Sep 14 21:31:18 ryan-vm kernel: [ 9118.145945] hello world
+Sep 14 21:31:18 ryan-vm kernel: [ 9118.146036] 17 and 200 will be added
+Sep 14 21:31:18 ryan-vm kernel: [ 9118.146037] Result is 217
