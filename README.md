@@ -1,11 +1,5 @@
 # PA1
 
-## Contact Info
--------------------
-Ryan Taylor
-109290202
-ryta4737@colorado.edu
-
 ## File Specifics
 -------------------
 ### csci3753_add.c
