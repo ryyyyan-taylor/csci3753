@@ -1,0 +1,138 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<errno.h>
+#include<fcntl.h>
+#include<string.h>
+#include<unistd.h>
+#include<malloc.h>
+
+ 
+#define BUFFER_LENGTH 256
+#define DEVICE "/dev/simple_character_device"
+static char receive[BUFFER_LENGTH];
+int debug = 1, fd = 0;
+int ppos = 0;
+
+int writeToDevice() {
+
+	int writeLength = 0;
+	ssize_t ret;
+	char *data = (char *)malloc(1024 * sizeof(char));
+
+	printf("enter data to be written to device:\n");
+	scanf(" %[^\n]%*c", data);
+
+	writeLength = strlen(data);
+	if (debug) printf("data written of length: %d\n", writeLength);
+	ret = write(fd, data, writeLength);
+
+	printf("offset now: %d", ppos);
+	
+	if (ret == -1) printf("write failed");
+	else printf("write successfull");
+
+	if (debug)fflush(stdout);
+	free(data);
+	return 0;
+}
+
+int readFromDevice() {
+	int readLength = 0;
+	ssize_t ret;
+	char *data = (char *)malloc(1024 * sizeof(char));
+
+	printf("enter length of buffer to read:\n");
+	scanf("%d", &readLength);
+
+	if(debug) printf("selected %d read length\n", readLength);
+	memset(data, 0, sizeof(data));
+	data[0] = '\0';
+	ret = read(fd, data, readLength);
+	printf("device read: %s\n", data);
+
+	if (ret == -1) printf("read failed");
+	else printf("read successfull");
+
+	if(debug)fflush(stdout);
+	free(data);
+	return 0;
+}
+
+int seekDevice() {
+	int offset = 0, whence = 0;
+
+	printf("seek offset:\n");
+	scanf("%d", &offset);
+
+	if (debug) printf("selected offset %d\n", offset);
+	printf("1 for SEEK_SET, 2 for SEEK_CUR, 3 for SEEK_END\n");
+	scanf("%d", &whence);
+	printf("whence value = %d\n", whence);
+
+	switch (whence) {
+
+	case 1:
+		lseek(fd, offset, SEEK_SET);
+		return 0;
+		break;
+
+	case 2:
+		lseek(fd, offset, SEEK_CUR);
+		return 0;
+		break;
+
+	case 3:
+		lseek(fd, offset, SEEK_END);
+		return 0;
+		break;
+
+	default:
+		printf("unknown value entered\n");
+		break;
+	}
+	if (debug)fflush(stdout);
+
+	return 0;
+}
+
+
+int main() {
+
+	char choice;
+	int value;
+	if (access(DEVICE, F_OK) == -1) {
+		printf("module not loaded\n");
+		return 0;
+	}
+	else printf("module loaded");
+	fd = open(DEVICE, O_RDWR);
+
+	while(1) {
+		printf("\nChoose:\nr: Read bytes\nw: Write string\ns: Seek device");
+		scanf(" %c", &choice);
+
+		if (choice == 'w') value = 1;
+		if (choice == 'r') value = 2;
+		if (choice == 's') value = 3;
+
+		switch (value) {
+
+		case 1:
+			printf("selected write\n");
+			writeToDevice();
+			break;
+
+		case 2:
+			printf("selected read\n");
+			readFromDevice();
+			break;
+
+		case 3:
+			seekDevice();
+			break;
+		}
+	}
+	close(fd);
+
+	return 0;
+}
