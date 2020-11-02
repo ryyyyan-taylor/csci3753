@@ -85,13 +85,6 @@ void* request(void* args) {
 			printf("RELEASING, moving on %s\n", filename);
 		}
 
-		// if (qEmpty(q)) {
-		// 	qPush(q, domain);
-		// 	pthread_cond_signal(&brake);
-		// 	printf("Signalling %s\n", filename);
-		// }
-
-		// else
 		qPush(q, domain);
 
 		printf("Domain %s from %s loaded\n", domain, filename);
@@ -289,6 +282,12 @@ int main(int argc, char const* argv[]) {
 	// pthread_mutex_destroy(&mqueue);
 	// pthread_mutex_destroy(&mout);
 
+	if (argc < 6) {
+		printf("Not enough arguments\n");
+		printf("multi-lookup <reqest threads> <resolve threads> <request log> <resolve log> <files ... ...>\n");
+		return EXIT_FAILURE;
+	}
+
 	FILE* serviced = NULL;
 	FILE* results = NULL;
 	int req = atoi(argv[1]);
@@ -297,11 +296,6 @@ int main(int argc, char const* argv[]) {
 	const char* resLog = argv[4];
 	int totalFiles = argc - 5;
 	printf("Loaded %d files\n", totalFiles);
-
-	if(argc < 6) {
-		fprintf(stderr,"Not enough arguments\n");
-		return EXIT_FAILURE;
-	}
 
 	serviced = fopen(reqLog, "w");
 	if (!serviced) {
