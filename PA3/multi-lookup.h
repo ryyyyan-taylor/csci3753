@@ -24,15 +24,14 @@ typedef struct rarg_s {
 	queue* q;
 	FILE* openFile;
 	int* count;
-} rarg;
+} resArgs;
 
 typedef struct rawr_s {
 	queue* q;
-	const char* fileName;
+	queue* files;
 	FILE* log;
-	int* filesCompleted;
-} rawr;
+} reqArgs;
 
 
-void* request(void* fileName);
-void* resolve();
+void* request(void* arg);
+void* resolve(void* args);

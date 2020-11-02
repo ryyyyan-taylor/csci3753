@@ -19,8 +19,6 @@ int qInit(queue* q, int size) {
 	q->rear = 0;
 	q->readOnly = 0;
 
-	printf("%d\n", q->maxSize);
-
 	return q->maxSize;
 }
 
@@ -37,7 +35,7 @@ int qFull(queue* q) {
 }
 
 void* qPop(queue* q) {
-	void* outPayload;
+	char* outPayload;
 
 	if (qEmpty(q))
 		return NULL;
@@ -49,7 +47,7 @@ void* qPop(queue* q) {
 	return outPayload;
 }
 
-int qPush(queue* q, void* newPayload) {
+int qPush(queue* q, char* newPayload) {
 
 	if (!q->readOnly) {
 		if (qFull(q))
