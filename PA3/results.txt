@@ -1,2 +1,0 @@
-youtube.com, 172.217.12.14
-facebook.com, 157.240.28.35

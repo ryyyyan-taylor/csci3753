@@ -52,9 +52,14 @@ void* request(void* args) {
 	// pthread_mutex_unlock(&mqueue);
 	// printf("request finished\n");
 
+	pthread_mutex_lock(&mpush); 
+	pthread_mutex_lock(&mqueue);
+
 	rawr* temp = (rawr*)args;
 	queue* q = temp->q;
 	const char* filename = temp->fileName;
+	FILE* results = temp->log;
+	int* fComplete = temp->filesCompleted;
 	free(args);
 	printf("Beginning requests\n");
 
@@ -75,9 +80,6 @@ void* request(void* args) {
 		domain = malloc(MAX_NAME_LENGTH * sizeof(char));
 		n = fscanf(file, INPUTFS, domain);
 		if (n < 0) continue;
-		pthread_mutex_lock(&mpush); 
-		pthread_mutex_lock(&mqueue);
-		printf("Queue and push locked %s\n", filename);
 
 		while (qFull(q)) {
 			printf("queue full, waiting on %s\n", filename);
@@ -94,6 +96,9 @@ void* request(void* args) {
 	}
 	printf("closing %s\n", filename);
 	fclose(file);
+
+	printf("Thread %ld serviced %d files\n", pthread_self(), *fComplete);
+
 	pthread_exit(NULL);
 }
 
@@ -111,14 +116,14 @@ void* resolve(void *arg) {
 	char ip[INET6_ADDRSTRLEN];
 	char* hostname;
 
-	while (reqWorking || !qEmpty(q)) {
+	while (!qEmpty(q)) {
 
-		// while(qEmpty(q));
+		while(qEmpty(q));
 		hostname = qPop(q);
 		printf("%s\n", hostname);
 
 		if (dnslookup(hostname, ip, sizeof(ip)) == UTIL_FAILURE) {
-			fprintf(stderr, "dnslookup error: %s", hostname);
+			fprintf(stderr, "dnslookup error: %s\n", hostname);
 			strncpy(ip, "", sizeof(ip));
 		}
 		fprintf(outputFile, "%s, %s\n", hostname, ip);
@@ -229,7 +234,7 @@ int main(int argc, char const* argv[]) {
 	// }
 
 	// if (req > totalFiles) {
-	// 	perror("Error, more reqThreads than input files, shrinking reqThreads to match");
+	// 	perror("Error, more requested than input files, shrinking requested to match");
 	// 	req = totalFiles;
 	// }
 
@@ -295,7 +300,7 @@ int main(int argc, char const* argv[]) {
 	const char* reqLog = argv[3];
 	const char* resLog = argv[4];
 	int totalFiles = argc - 5;
-	printf("Loaded %d files\n", totalFiles);
+	printf("Read %d filenames from args\n", totalFiles);
 
 	serviced = fopen(reqLog, "w");
 	if (!serviced) {
@@ -309,7 +314,7 @@ int main(int argc, char const* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	pthread_t reqThreads[req];
+	pthread_t requested[req];
 	const char* filename[req];
 
 	queue q;
@@ -326,26 +331,28 @@ int main(int argc, char const* argv[]) {
 		printf("%s\n", filename[i]);
 		args->q = &q;
 		args->fileName = filename[i];
-		pthread_create(&reqThreads[i], NULL, request, args);
+		args->log = results;
+		pthread_create(&requested[i], NULL, request, args);
 	}
 
+	pthread_mutex_lock(&mqueue);
 	rarg* arg = malloc(sizeof(rarg));
 	arg->q = &q;
 	arg->openFile = results;
-	
-	pthread_t resThreads[res];
-	
-	for (int i = 0; i < req; i++)
-		pthread_join(reqThreads[i], NULL);
+	pthread_mutex_unlock(&mqueue);
+
+	pthread_t resolved[res];
 
 	for (int i = 0; i < res; i++) 
-		pthread_create(&resThreads[i], NULL, resolve, arg);
+		pthread_create(&resolved[i], NULL, resolve, arg);
 
+	for (int i = 0; i < req; i++)
+		pthread_join(requested[i], NULL);
 
-	// q.readOnly = 1;
+	q.readOnly = 1;
 
 	for (int i = 0; i < res; i++)
-		pthread_join(resThreads[i], NULL);
+		pthread_join(resolved[i], NULL);
 
 	fclose(serviced);
 	fclose(results);

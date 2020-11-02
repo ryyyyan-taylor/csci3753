@@ -29,6 +29,7 @@ typedef struct rarg_s {
 typedef struct rawr_s {
 	queue* q;
 	const char* fileName;
+	FILE* log;
 	int* filesCompleted;
 } rawr;
 
