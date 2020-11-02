@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <time.h>
 #include <semaphore.h>
 #include "queue.h"
 #include "util.h"
@@ -19,11 +23,13 @@
 typedef struct rarg_s {
 	queue* q;
 	FILE* openFile;
+	int* count;
 } rarg;
 
 typedef struct rawr_s {
 	queue* q;
 	const char* fileName;
+	int* filesCompleted;
 } rawr;
 
 
