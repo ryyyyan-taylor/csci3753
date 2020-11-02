@@ -8,6 +8,8 @@ pthread_mutex_t mrfile = PTHREAD_MUTEX_INITIALIZER;
 
 void* request(void* args) {
 
+	printf("Opening request thread\n");
+
 	pthread_mutex_lock(&mpush); 
 	pthread_mutex_lock(&mqueue);
 
@@ -16,8 +18,9 @@ void* request(void* args) {
 	queue* f = temp->files;
 	FILE* serviced = temp->log;
 
-	char* domain = NULL;
+	char domain [1025];
 	char* filename = NULL;
+	char* host;
 
 	int servedFiles = 0;
 
@@ -37,32 +40,35 @@ void* request(void* args) {
 		// get push all lines from file to queue
 		while (n > 0) {
 
-			domain = malloc(MAX_NAME_LENGTH * sizeof(char));
+			// domain = malloc(MAX_NAME_LENGTH * sizeof(char));
+
 			n = fscanf(file, INPUTFS, domain);
+			host = strdup(domain);
 			if (n < 0) continue;
 
 			while (qFull(q)) {
 				pthread_cond_wait(&brake, &mqueue);
 			}
 
-			qPush(q, domain);
+			qPush(q, (void*) host);
 			pthread_mutex_unlock(&mqueue);
 			pthread_mutex_unlock(&mpush);
 		}
 		servedFiles++;
 		fclose(file);
+		free(host);
 	}
 
 	pthread_mutex_lock(&msfile);
 	fprintf(serviced, "Thread id: %ld serviced %d files\n", pthread_self(), servedFiles);
 	pthread_mutex_unlock(&msfile);
 
-	free(domain);
-
 	return NULL;
 }
 
 void* resolve(void *arg) {
+
+	printf("Opening resolve thread\n");
 
 	pthread_mutex_lock(&mqueue);
 
@@ -75,7 +81,7 @@ void* resolve(void *arg) {
 
 	while (!qEmpty(q)) {
 
-		while(qEmpty(q));
+		// pthread_mutex_lock(&mqueue);
 		hostname = qPop(q);
 		pthread_mutex_unlock(&mqueue);
 

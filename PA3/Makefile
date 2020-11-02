@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -Wextra -Wall -g
 INCLUDES = 
 LFLAGS = 
-LIBS = -pthread
+LIBS = -lpthread
 
 MAIN = multi-lookup
 
