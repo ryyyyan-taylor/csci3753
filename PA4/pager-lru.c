@@ -15,12 +15,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "simulator.h"
 
 void pageit(Pentry q[MAXPROCESSES]) {
 
-    /* ===== START GIVEN ===== */
     /* This file contains the stub for an LRU pager */
     /* You may need to add/remove/modify any part of this file */
 
@@ -29,11 +27,10 @@ void pageit(Pentry q[MAXPROCESSES]) {
     static int tick = 1; // artificial time
     static int timestamps[MAXPROCESSES][MAXPROCPAGES]; // Helps keep track of least recently used
 
-    /* Local vars */
+    // local counters
     int proctmp;
     int pagetmp;
 
-    /* initialize static vars on first run */
     if (!initialized) {
         for (proctmp = 0; proctmp < MAXPROCESSES; proctmp++) {
             for (pagetmp = 0; pagetmp < MAXPROCPAGES; pagetmp++)
@@ -42,43 +39,39 @@ void pageit(Pentry q[MAXPROCESSES]) {
         initialized = 1;
     }
 
-    /* TODO: Implement LRU Paging */
-    /* ===== END GIVEN ===== */
 
+    int pCounter, oldPage, minTime, lruPage; 
 
-    int pCounter; // pc of current process
-    int oldPage; // Our old page
-    int minTime; // Keeping track of l-r used page with artificial "time" ticks
-    int lruPage; // Keeping track of the lru page
+    // proctmp : index through q 
+    // pagetmp : new page
 
-    // i : index through q 
-    // j : new page
+    for (proctmp = 0; proctmp < MAXPROCESSES; proctmp++) {
 
-    for (int i = 0; i < MAXPROCESSES; i++) {
-        /* Is process active? If not then it doesn't enter any of the following */
-        if (q[i].active) {
-            /* The following is for first active process */
-            pCounter = q[i].pc; // program counter value for this process
-            oldPage = pCounter / PAGESIZE; // page the program counter needs(might actually be the old one soon)
-            timestamps[i][oldPage] = tick;
-            /* Check if the page is swapped out? */
-            if (!q[i].pages[oldPage]) {
-                /* Try to perform the swap in with pagein() if we can */
-                if (!pagein(i, oldPage)) { // Will enter block if pageavail==0
-                    minTime = tick; // Set minimum to keep track of time while iterating
-                    /* If swapping fails, this is where we decide swap out another page(our "new" page) */
-                    for (int j = 0; j < MAXPROCPAGES; j++) {
+        if (q[proctmp].active) {
+            
+            // set variables for current process
+            pCounter = q[proctmp].pc;
+            oldPage = pCounter / PAGESIZE;
+            timestamps[proctmp][oldPage] = tick;
+            
+            if (!q[proctmp].pages[oldPage]) {
 
-                        if (q[i].pages[j] == 1) {
-                            if (timestamps[i][j] < minTime) {
-                                minTime = timestamps[i][j];
-                                lruPage = j;
+                if (!pagein(proctmp, oldPage)) {
+                    // reset minimum
+                    minTime = tick;
+                    
+                    for (pagetmp = 0; pagetmp < MAXPROCPAGES; pagetmp++) {
+
+                        if (q[proctmp].pages[pagetmp] == 1) {
+                            if (timestamps[proctmp][pagetmp] < minTime) {
+                                minTime = timestamps[proctmp][pagetmp];
+                                lruPage = pagetmp;
                             }
-                        } else if (!(q[i].pages[j]))
-                            continue;
+                        }
+                        else if (!(q[proctmp].pages[pagetmp])) continue;
                     }
 
-                    if (!pageout(i, lruPage))
+                    if (!pageout(proctmp, lruPage))
                         printf(" FAILED TO PAGEOUT\n");
                 }
             }
