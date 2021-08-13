@@ -1,0 +1,34 @@
+Ryan Taylor PA3
+
+Requester Threads: 1
+Resolver Threads: 1
+Thread id: 139837652571904 serviced 30 files
+Took 58.850040 seconds
+
+Requester Threads: 1
+Resolver Threads: 3
+Thread id: 140681151706880 serviced 30 files
+Took 14.850240 seconds 
+
+Requester Threads: 3
+Resolver Threads: 1
+Thread id: 140440609945344 serviced 9 files
+Thread id: 140440618338048 serviced 10 files
+Thread id: 140440626730752 serviced 11 files
+Took 45.341799 seconds
+
+Requester Threads: 3
+Resolver Threads: 3
+Thread id: 140437557368576 serviced 9 files
+Thread id: 140437565761280 serviced 10 files
+Thread id: 140437574153984 serviced 11 files
+Took 12.133421 seconds
+
+Requester Threads: 5
+Resolver Threads: 5
+Thread id: 140462656874240 serviced 5 files
+Thread id: 140462665266944 serviced 5 files
+Thread id: 140462690445056 serviced 7 files
+Thread id: 140462673659648 serviced 6 files
+Thread id: 140462682052352 serviced 7 files
+Took 11.327921 seconds

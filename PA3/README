@@ -1,0 +1,10 @@
+# Ryan Taylor - PA3
+
+## multi-lookup.c / multi-lookup.h
+Implementation of entire program. Header file defines structs to allow the passage of arguments to request and resolve functions. C implementation file contains implementations for resolve, request, and main.
+
+## queue.c / queue.h
+Adapted queue implementation from data structures coure. The functions defined are not inherently thread safe. Queues used for the list of domain names and list of files to be read from.
+
+## util.c / util.h
+Given helper functions for dealing with dnslookups for domain names, not edited at all from what was given.

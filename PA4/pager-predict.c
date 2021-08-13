@@ -158,9 +158,9 @@ void pageit(Pentry q[MAXPROCESSES]) {
                 // find lru via timestamp
                 if (q[i].pages[j] == 1 && timestamps[i][j] < n) {
                     n = timestamps[i][j];
+                    lruPage = j;
+                    status = true;
                 }
-                lruPage = j;
-                status = true;
             }
         }
 
@@ -184,6 +184,7 @@ void pageit(Pentry q[MAXPROCESSES]) {
         if (!q[proctmp].active) continue;
 
         int counter = q[proctmp].pc;
+        // jump forward, 100 ish seemed to be best
         predictions = hist[proctmp][(counter + 101) / PAGESIZE];
 
         // sort by most likely
